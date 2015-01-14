@@ -1,0 +1,29 @@
+{
+  "name": "app-context",
+  "description": "Bootloader and context for node projects",
+  "version": "0.0.1",
+  "homepage": "https://github.com/mattinsler/app-context",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mattinsler/app-context.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mattinsler/app-context/issues"
+  },
+  "main": "lib/app-context",
+  "scripts": {
+    "test": "mocha"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "dependencies": {
+    "q": "^1.1.2"
+  },
+  "devDependencies": {
+    "mocha": "^2.0.1",
+    "mocha-jshint": "0.0.9",
+    "monotonic-timestamp": "0.0.9"
+  },
+  "keywords": []
+}
