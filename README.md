@@ -1,5 +1,7 @@
 # app-context
 
+[![Code Climate](https://codeclimate.com/github/app-context/app-context/badges/gpa.svg)](https://codeclimate.com/github/app-context/app-context)
+
 Sequential bootloader and context for node applications
 
 ## Installation
