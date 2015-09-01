@@ -14,8 +14,8 @@ class BasicError extends Error {
 class UsageError extends BasicError {}
 class MessageError extends BasicError {}
 
-export function usage(message) { return new UsageError(message); }
-export function message(message) { return new MessageError(message); }
+export function usage(msg) { return new UsageError(msg); }
+export function message(msg) { return new MessageError(msg); }
 
 
 function formatConfig(args) {
@@ -65,7 +65,4 @@ ${status}
   }
 
   return error;
-}
-export function install(err) {
-  let error = new MessageError();
 }

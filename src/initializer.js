@@ -32,7 +32,7 @@ function transformStrings(item, transformer) {
     return item.map((i) => transformStrings(i, transformer));
   } else if (isPlainObject(item)) {
     return Object.keys(item).reduce((o, k) => {
-      let v = item[k]
+      let v = item[k];
       o[k] = transformStrings(v, transformer);
       return o;
     }, {});
@@ -46,9 +46,9 @@ function transformStrings(item, transformer) {
 function resolveContextItem(item, context) {
   return transformStrings(item, function(str) {
     var m;
-    while (m = /\$\{([^\}]+)\}/.exec(str)) {
+    while ((m = /\$\{([^\}]+)\}/.exec(str)) != null) {
       let v = utils.getValue(context, m[1]);
-      if (v == null) { v = process.env[m[1]] };
+      if (v == null) { v = process.env[m[1]]; }
       if (v == null) { throw new Error(`Could not resolve "${m[0]}". It does not exist in the context or as an environment variable.`); }
       if (m[0] === str) {
         str = v;
