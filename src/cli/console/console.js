@@ -12,6 +12,8 @@ import readline from 'readline';
 import stripAnsi from 'strip-ansi';
 import isPlainObject from 'lodash.isplainobject';
 
+import {orderObject} from '../../utils';
+
 function rpad(value, len, char) {
   value = value.toString();
   char = (char || ' ').toString();
@@ -22,14 +24,6 @@ function prefixLine(prefix, color) {
   return function(line) {
     return chalk[color](prefix) + ':  ' + line;
   };
-}
-
-function orderObject(obj) {
-  return Object.keys(obj).sort().reduce((o, k) => {
-    const v = obj[k];
-    o[k] = isPlainObject(v) ? orderObject(v) : v;
-    return o;
-  }, {});
 }
 
 export function start(opts) {
@@ -93,7 +87,7 @@ export function start(opts) {
       // don't run blank lines
       /* jshint evil:true */
       if (code.replace(/ *\n */g, '') === '()') { return callback(null, undefined); }
-
+      
       magic.eval(code, context, file, function(err, result) {
         // maybe check on context?
         if (err) return callback(null, err);

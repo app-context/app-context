@@ -1,15 +1,7 @@
 import os from 'os';
-import isPlainObject from 'lodash.isplainobject';
+import {orderObject} from '../utils';
 
 import AppContext from '../../';
-
-function orderObject(obj) {
-  return Object.keys(obj).sort().reduce((o, k) => {
-    const v = obj[k];
-    o[k] = isPlainObject(v) ? orderObject(v) : v;
-    return o;
-  }, {});
-}
 
 export const description = 'Print configuration';
 

@@ -1,4 +1,4 @@
-# app-context
+# [app-context](https://app-context.github.io/)
 
 [![Code Climate](https://codeclimate.com/github/app-context/app-context/badges/gpa.svg)](https://codeclimate.com/github/app-context/app-context)
 

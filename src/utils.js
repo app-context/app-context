@@ -1,3 +1,5 @@
+import isPlainObject from 'lodash.isplainobject';
+
 export function getValue(obj, key) {
   let o = obj;
   const keys = Array.isArray(key) ? key : key.split('.');
@@ -22,4 +24,12 @@ export function setValue(obj, key, value) {
   }
 
   o[keys[keys.length - 1]] = value;
+}
+
+export function orderObject(obj) {
+  return Object.keys(obj).sort().reduce((o, k) => {
+    const v = obj[k];
+    o[k] = isPlainObject(v) ? orderObject(v) : v;
+    return o;
+  }, {});
 }

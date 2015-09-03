@@ -6,7 +6,7 @@ import isPlainObject from 'lodash.isplainobject';
 
 import * as utils from './utils';
 
-const debug = require('debug')('initializer');
+const debug = require('debug')('app-context:initializer');
 
 function npmInstall(moduleName) {
   return new Promise(function(resolve, reject) {

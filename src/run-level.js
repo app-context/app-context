@@ -4,7 +4,7 @@ import * as errors from './errors';
 import AppContext from './app-context';
 import Initializer from './initializer';
 
-const debug = require('debug')('run-level');
+const debug = require('debug')('app-context:run-level');
 
 export default class RunLevel {
   constructor(builder, level) {

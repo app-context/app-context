@@ -55,8 +55,7 @@ export default class AppContext {
     this.currentRunlevel = 0;
   }
 
-  transitionTo(level) {
-    if (level == null) { level = 10; }
+  transitionTo(level = 10) {
     level = AppContext.resolveRunLevel(level);
     if (level < this.currentRunlevel) { throw new Error('app-context can only transition to a level great than the current run level.'); }
     if (level === this.currentRunlevel) { return Promise.resolve(); }
@@ -120,14 +119,17 @@ export default class AppContext {
     return context;
   }
 
-  static loadFromFile(filename, opts) {
-    debug('Load from file: ' + filename);
+  static loadFromFile(filename, opts, shouldThrow = true) {
     try {
       filename = require.resolve(filename);
     } catch (err) {
-      throw errors.message('Could not find an app-context at ' + filename);
+      if (shouldThrow) {
+        throw errors.message('Could not find an app-context at ' + filename);
+      } else {
+        return null;
+      }
     }
-    debug('Resolved to: ' + filename);
+    debug('Load from file: ' + filename);
 
     let extension = path.extname(filename);
     if (extension !== '.js') { throw errors.message('app-context can only be loaded from .js files'); }
@@ -150,13 +152,17 @@ export default class AppContext {
 
   static findAndLoadPackage(dir) {
     let packageFile = this.findPackageFile(dir);
-    if (packageFile == null) { throw new Error('Unable to find package.json file'); }
+    if (packageFile == null) { throw errors.message('Unable to find package.json file'); }
 
     return require(packageFile);
   }
 
-  static getAppContextFilenameFromPackage() {
-    return this.findAndLoadPackage()['app-context'];
+  static getAppContextFilenameFromPackage(shouldThrow = true) {
+    try {
+      return this.findAndLoadPackage()['app-context'];
+    } catch (err) {
+      if (shouldThrow) { throw err; }
+    }
   }
 
   static loadGlobal() {
@@ -164,17 +170,32 @@ export default class AppContext {
     return this.loadFromFile(path.join(root, 'app-context'), {root: root});
   }
 
-  static loadFromPackage() {
-    let filename = this.getAppContextFilenameFromPackage();
-    if (filename == null) { throw new Error('Your package.json does not define an "app-context".'); }
+  static loadFromPackage(shouldThrow = true) {
+    let filename = this.getAppContextFilenameFromPackage(shouldThrow);
+    if (filename == null) {
+      if (shouldThrow) {
+        throw errors.message('Your package.json does not define an "app-context".');
+      } else {
+        return null;
+      }
+    }
 
+    debug('Found context in package: ' + filename);
     return this.loadFromFile(filename);
   }
 
   static load(/* optional */ filename) {
-    if (filename) { return this.loadFromFile(filename); }
-    if (this.getAppContextFilenameFromPackage()) { return this.loadFromPackage(); }
-    return this.loadFromFile(path.join(process.cwd(), 'app-context'));
+    let context = null;
+
+    if (filename) { context = this.loadFromFile(filename); }
+    if (context == null) { context = this.loadFromPackage(false); }
+    if (context == null) { context = this.loadFromFile(path.join(process.cwd(), 'app-context'), {}, false); }
+    if (context == null) {
+      debug('No context file, loading an empty context');
+      context = this.create(function(){});
+    }
+
+    return context;
   }
 }
 
