@@ -12,10 +12,22 @@ class BasicError extends Error {
 }
 
 class UsageError extends BasicError {}
-class MessageError extends BasicError {}
+class MessageError extends BasicError {
+  constructor(message, err) {
+    super(message);
+    if (err != null) {
+      this.err = err;
+      this.message += `
+
+Stack Trace
+===========
+${err.stack.split(os.EOL).join(os.EOL)}`;
+    }
+  }
+}
 
 export function usage(msg) { return new UsageError(msg); }
-export function message(msg) { return new MessageError(msg); }
+export function message(msg, err) { return new MessageError(msg, err); }
 
 
 function formatConfig(args) {
