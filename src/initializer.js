@@ -93,6 +93,7 @@ export default class Initializer {
 
   resolve(context) {
     debug('resolve');
+
     // resolve context/environment substitution
     this.args = resolveContextItem(this.originalArgs, context);
     // resolve config substitution
@@ -100,9 +101,18 @@ export default class Initializer {
   }
 
   execute(context) {
+    // resolving args first so that problems can be caught before possibly waiting for an install
     this.resolve(context);
 
     return this.install().then(() => {
+      // check for default args now that we definitely have a method
+      if (this.originalArgs.length === 0 && this.method.defaultArgs) {
+        // resolve again in case the defaults need it
+        this.originalArgs = clone(this.method.defaultArgs);
+        if (!Array.isArray(this.originalArgs)) { this.originalArgs = [this.originalArgs]; }
+        this.resolve(context);
+      }
+
       // resolve method - initialize if necessary
       if (this.args.length > 0) {
         this.method = this.method.apply(null, clone(this.args));
