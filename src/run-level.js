@@ -22,9 +22,8 @@ export default class RunLevel {
     * use(function(context) { return new Promise(...) })
     * use(function(context, done) { done() })
    **/
-  use() {
-    let args = Array.prototype.slice.call(arguments);
-    if (args.length === 0) { throw new Error(''); }
+  use(...args) {
+    if (args.length === 0) { throw errors.message('Cannot call .use() without any arguments.'); }
 
     let first = args.shift();
 

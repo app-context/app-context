@@ -151,10 +151,19 @@ export default class Initializer {
   }
 
   static createFromModule(runlevel, moduleName, args) {
+    let name;
+    let match = moduleName.match(/^@[^\/]+\/(.+)$/);
+    if (match) {
+      name = match[1];
+    } else {
+      name = moduleName;
+      moduleName = `app-context-${moduleName}`;
+    }
+
     return new Initializer(runlevel, {
       type: 'module',
-      name: moduleName,
-      module: `app-context-${moduleName}`,
+      name: name,
+      module: moduleName,
       originalArgs: args
     });
   }

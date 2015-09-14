@@ -132,11 +132,25 @@ package named `app-context-{initializer name}`. If that package does not exist
 in your `node_modules` directory, `app-context` will attempt to npm install that
 package, saving it to your `package.json` file.
 
-#### Available initializers
+#### Public initializer registry
 
 For a list of currently available initializers that can be auto-installed, check
-out https://www.npmjs.com/browse/keyword/app-context for now. There will be a
-listing webpage at some point in the future.
+out [http://app-contextjs.com/initializers](http://app-contextjs.com/initializers).
+
+#### Scoped initializers
+
+If you'd like to publish initializers for your own use that you would not like
+to be listed in the public registry, just publish your initializer package in a
+scope. You can then reference your initializer for automatic installation and use
+by using the scoped package name.
+
+```javascript
+  this.runlevel('initialized')
+    // loads the @mattinsler/special-sauce npm package
+    .use('@mattinsler/special-sauce');
+```
+
+For information on how to publish a scoped module, [check here](https://docs.npmjs.com/getting-started/scoped-packages).
 
 ## Run Levels
 
@@ -302,5 +316,3 @@ exports.index = function(req, res, next) {
 - APP.**root** - *root directory of the app (where the package.json or app-context.js was found)*
 - APP.**environment** - *NODE_ENV environment variable - defaults to `development`*
 - APP.**config** - *where configuration should be written to (defaulted to `{}`)*
-- APP.**runlevels** - *(internal)*
-- APP.**currentRunlevel** - *(internal)*

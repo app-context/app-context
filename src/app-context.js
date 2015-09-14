@@ -55,6 +55,8 @@ export default class AppContext {
     this.currentRunlevel = 0;
   }
 
+  get currentRunlevelName() { return AppContext.getRunLevelName(this.currentRunlevel); }
+
   transitionTo(level = 10) {
     level = AppContext.resolveRunLevel(level);
     if (level < this.currentRunlevel) { throw new Error('app-context can only transition to a level great than the current run level.'); }
