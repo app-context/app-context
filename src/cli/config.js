@@ -1,7 +1,8 @@
 import os from 'os';
-import {orderObject} from '../utils';
+import stringify from 'json-stringify-safe';
 
 import AppContext from '../../';
+import {orderObject} from '../utils';
 
 export const description = 'Print configuration';
 
@@ -17,7 +18,7 @@ export function execute(args, opts) {
   return context.transitionTo('configured').then(function() {
     console.log([
       '',
-      JSON.stringify(orderObject(APP.config), null, 2),
+      stringify(orderObject(APP.config), null, 2),
       ''
     ].join(os.EOL));
   });

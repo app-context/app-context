@@ -1,5 +1,6 @@
 import os from 'os';
 import util from 'util';
+import stringify from 'json-stringify-safe';
 
 class BasicError extends Error {
   constructor(message) {
@@ -33,7 +34,7 @@ export function message(msg, err) { return new MessageError(msg, err); }
 function formatConfig(args) {
   if (args == null || args.length === 0) { return ''; }
   if (args.length === 1) { args = args[0]; }
-  return JSON.stringify(args, null, 2).split(os.EOL).join(os.EOL + '      ');
+  return stringify(args, null, 2).split(os.EOL).join(os.EOL + '      ');
 }
 
 export function initializer(err) {

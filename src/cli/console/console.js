@@ -10,6 +10,7 @@ import Promise from 'bluebird';
 import hasAnsi from 'has-ansi';
 import readline from 'readline';
 import stripAnsi from 'strip-ansi';
+import stringify from 'json-stringify-safe';
 import isPlainObject from 'lodash.isplainobject';
 
 import {orderObject} from '../../utils';
@@ -87,7 +88,7 @@ export function start(opts) {
       // don't run blank lines
       /* jshint evil:true */
       if (code.replace(/ *\n */g, '') === '()') { return callback(null, undefined); }
-      
+
       magic.eval(code, context, file, function(err, result) {
         // maybe check on context?
         if (err) return callback(null, err);
@@ -107,7 +108,7 @@ export function start(opts) {
 
       let text;
       if (isPlainObject(object)) {
-        text = JSON.stringify(orderObject(object), null, 2);
+        text = stringify(orderObject(object), null, 2);
       } else if (typeof(object) === 'function') {
         text = object.toString();
       } else {
