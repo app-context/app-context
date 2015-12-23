@@ -7,6 +7,17 @@ import * as errors from './errors';
 
 const debug = require('debug')('app-context');
 
+require('babel-register')({
+  presets: [require('babel-preset-es2015')],
+  plugins: [
+    require('babel-plugin-add-module-exports'),
+    require('babel-plugin-transform-async-to-generator')
+  ],
+  sourceMaps: 'inline',
+  ignore: new RegExp(path.sep + 'node_modules' + path.sep)
+});
+require('babel-polyfill');
+
 const RunLevel = {
   None: 0,
   Setup: 1,

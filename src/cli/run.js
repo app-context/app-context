@@ -25,6 +25,7 @@ export function execute([script]) {
     try {
       scriptModule = require(fullPath);
     } catch (err) {
+      console.log(err.stack);
       throw errors.message('There was an error while loading your script.', err);
     }
     const method = scriptModule && typeof(scriptModule.execute) === 'function' ? scriptModule.execute : typeof(scriptModule) === 'function' ? scriptModule : null;
