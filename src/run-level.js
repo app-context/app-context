@@ -1,5 +1,3 @@
-import Promise from 'bluebird';
-
 import * as errors from './errors';
 import AppContext from './app-context';
 import Initializer from './initializer';

@@ -1,5 +1,3 @@
-import Promise from 'bluebird';
-
 import AppContext from '../../';
 
 export const description = 'Initialize and start your project';

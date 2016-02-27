@@ -241,8 +241,6 @@ module.exports = function() {
 ### Asynchronous Initializers (promises)
 
 ```javascript
-var Promise = require('bluebird');
-
 function init(context) {
   // either
   return promisedAction(context);
@@ -262,8 +260,6 @@ module.exports = function() {
 #### - with configuration
 
 ```javascript
-var Promise = require('bluebird');
-
 function init(name) {
   return function(context) {
     // either

@@ -6,7 +6,6 @@ import util from 'util';
 import chalk from 'chalk';
 import clone from 'clone';
 import stream from 'stream';
-import Promise from 'bluebird';
 import hasAnsi from 'has-ansi';
 import readline from 'readline';
 import stripAnsi from 'strip-ansi';

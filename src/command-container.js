@@ -1,6 +1,5 @@
 import os from 'os';
 import chalk from 'chalk';
-import Promise from 'bluebird';
 
 function rpad(v, len, c) {
   v = v.toString();

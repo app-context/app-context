@@ -1,31 +1,11 @@
-import npm from 'npm';
 import path from 'path';
 import clone from 'clone';
-import Promise from 'bluebird';
 import isPlainObject from 'lodash.isplainobject';
 
 import * as utils from './utils';
+import * as errors from './errors';
 
 const debug = require('debug')('app-context:initializer');
-
-function npmInstall(moduleName) {
-  return new Promise(function(resolve, reject) {
-    try {
-      resolve(require(path.join(APP.root, 'node_modules', moduleName)));
-    } catch (err) {
-      let npmOpts = {cwd: APP.root, production: true};
-      if (APP.package) { npmOpts.save = true; }
-
-      npm.load(npmOpts, function(err) {
-        if (err) { return reject(err); }
-        npm.commands.install([moduleName], function(err, data) {
-          if (err) { return reject(err); }
-          resolve(require(path.join(APP.root, 'node_modules', moduleName)));
-        });
-      });
-    }
-  });
-}
 
 function transformStrings(item, transformer) {
   if (Array.isArray(item)) {
@@ -77,18 +57,22 @@ export default class Initializer {
     Object.keys(opts).forEach((k) => this[k] = opts[k]);
   }
 
-  install() {
-    debug('install');
-    if (this.module == null) { return Promise.resolve(); }
-    return npmInstall(this.module).then((method) => {
-      this.method = method;
-    }).catch(function(err) {
-      if (err.code === 'E404') {
-        err.type = 'install';
-      }
+  resolveModule() {
+    debug('resolveModule');
+    if (this.module) {
+      try {
+        const modulePath = path.join(APP.root, 'node_modules', this.module);
+        this.method = require(modulePath);
+      } catch (err) {
+        if (err.code === 'E404') {
+          err.type = 'install';
+        } else if (err.code === 'MODULE_NOT_FOUND') {
+          err.type = 'resolveModule';
+        }
 
-      throw err;
-    });
+        throw err;
+      }
+    }
   }
 
   resolve(context) {
@@ -101,29 +85,31 @@ export default class Initializer {
   }
 
   execute(context) {
-    // resolving args first so that problems can be caught before possibly waiting for an install
-    this.resolve(context);
-
-    return this.install().then(() => {
-      // check for default args now that we definitely have a method
-      if (this.originalArgs.length === 0 && this.method.defaultArgs) {
-        // resolve again in case the defaults need it
-        this.originalArgs = clone(this.method.defaultArgs);
-        if (!Array.isArray(this.originalArgs)) { this.originalArgs = [this.originalArgs]; }
+    // wrap in a promise for consistent error handling
+    return new Promise((resolve, reject) => {
+      try {
+        // resolving args first so that problems can be caught before possibly waiting for an install
         this.resolve(context);
-      }
+        this.resolveModule();
 
-      // resolve method - initialize if necessary
-      if (this.args.length > 0) {
-        this.method = this.method.apply(null, clone(this.args));
-      }
+        // check for default args now that we definitely have a method
+        if (this.originalArgs.length === 0 && this.method.defaultArgs) {
+          // resolve again in case the defaults need it
+          this.originalArgs = clone(this.method.defaultArgs);
+          if (!Array.isArray(this.originalArgs)) { this.originalArgs = [this.originalArgs]; }
+          this.resolve(context);
+        }
 
-      const method = this.method;
-      const timeoutDuration = this.builder.get('timeout');
+        // resolve method - initialize if necessary
+        if (this.args.length > 0) {
+          this.method = this.method.apply(null, clone(this.args));
+        }
 
-      debug('execute');
+        const method = this.method;
+        const timeoutDuration = this.builder.get('timeout');
 
-      return new Promise((resolve, reject) => {
+        debug('execute');
+
         const timeoutId = setTimeout(function() {
           let error = new Error();
           error.type = 'timeout';
@@ -146,7 +132,9 @@ export default class Initializer {
             reject(err);
           });
         }
-      });
+      } catch (err) {
+        reject(err);
+      }
     });
   }
 
@@ -155,6 +143,8 @@ export default class Initializer {
     let match = moduleName.match(/^@[^\/]+\/(.+)$/);
     if (match) {
       name = match[1];
+    } else if (moduleName.indexOf('/') !== -1) {
+      throw errors.message(`Local initializer names are not supported: ${moduleName}`);
     } else {
       name = moduleName;
       moduleName = `app-context-${moduleName}`;

@@ -66,6 +66,11 @@ ${status}
   Timeout: Initializer took greater than ${err.timeoutDuration} milliseconds.
 ${status}
 `;
+  } else if (err.type === 'resolveModule') {
+    error.message = `
+  Could not find the "${err.initializer.name}" initializer.
+  Fix this by running "app-context install".
+`;
   } else {
     error.message = `
   An error occured while initializing your application.

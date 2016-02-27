@@ -1,22 +1,13 @@
+import 'babel-polyfill';
+
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import osenv from 'osenv';
-import Promise from 'bluebird';
 
 import * as errors from './errors';
 
 const debug = require('debug')('app-context');
-
-require('babel-register')({
-  presets: [require('babel-preset-es2015')],
-  plugins: [
-    require('babel-plugin-add-module-exports'),
-    require('babel-plugin-transform-async-to-generator')
-  ],
-  sourceMaps: 'inline',
-  ignore: new RegExp(path.sep + 'node_modules' + path.sep)
-});
-require('babel-polyfill');
 
 const RunLevel = {
   None: 0,
@@ -146,6 +137,35 @@ export default class AppContext {
 
     let extension = path.extname(filename);
     if (extension !== '.js') { throw errors.message('app-context can only be loaded from .js files'); }
+
+    // handle babel...
+    const babelFile = path.join(process.cwd(), '.babelrc');
+    if (fs.existsSync(babelFile)) {
+      const babelData = JSON.parse(fs.readFileSync(babelFile, 'utf8'));
+
+      const unmetRequirements = [].concat(
+        (babelData.presets || []).map((p) => `babel-preset-${p}`),
+        (babelData.plugins || []).map((p) => `babel-plugin-${p}`)
+      ).filter((name) => {
+        try {
+          require.resolve(path.join(process.cwd(), 'node_modules', name));
+          return false;
+        } catch (err) {
+          return true;
+        }
+      });
+
+      if (unmetRequirements.length > 0) {
+        throw errors.message([
+          'Unmet babel requirements: ' + unmetRequirements.join(', '),
+          'Fix this by running "npm install --save --save-exact ' + unmetRequirements.join(' ') + '"'
+        ].join(os.EOL))
+      }
+
+      require('babel-register')({
+        sourceRoot: process.cwd()
+      });
+    }
 
     let contextInitializer = require(filename);
     return this.create(contextInitializer, opts);

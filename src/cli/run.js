@@ -1,5 +1,4 @@
 import path from 'path';
-import Promise from 'bluebird';
 
 import * as errors from '../errors';
 import AppContext from '../../';
