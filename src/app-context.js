@@ -108,6 +108,8 @@ export default class AppContext {
 
     if (typeof(contextInitializer) === 'function') {
       contextInitializer.call(builder);
+    } else if (typeof(contextInitializer.default) === 'function') {
+      contextInitializer.default.call(builder);
     } else {
       throw new Error('You must pass a method to create an app-context');
     }
