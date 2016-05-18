@@ -1,4 +1,5 @@
 import path from 'path';
+import es6require from '@mattinsler/es6require';
 
 import * as errors from '../errors';
 import AppContext from '../../';
@@ -22,9 +23,8 @@ export function execute([script]) {
   return AppContext.load().transitionTo('initialized').then(function() {
     let scriptModule;
     try {
-      scriptModule = require(fullPath);
+      scriptModule = es6require(fullPath);
     } catch (err) {
-      console.log(err.stack);
       throw errors.message('There was an error while loading your script.', err);
     }
     const method = scriptModule && typeof(scriptModule.execute) === 'function' ? scriptModule.execute : typeof(scriptModule) === 'function' ? scriptModule : null;

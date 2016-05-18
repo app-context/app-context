@@ -1,5 +1,6 @@
 import path from 'path';
 import clone from 'clone';
+import es6require from '@mattinsler/es6require';
 import isPlainObject from 'lodash.isplainobject';
 
 import * as utils from './utils';
@@ -61,8 +62,7 @@ export default class Initializer {
     debug('resolveModule');
     if (this.module) {
       try {
-        const modulePath = path.join(APP.root, 'node_modules', this.module);
-        this.method = require(modulePath);
+        this.method = es6require(APP.root, 'node_modules', this.module);
       } catch (err) {
         if (err.code === 'E404') {
           err.type = 'install';

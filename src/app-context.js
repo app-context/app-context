@@ -4,6 +4,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import osenv from 'osenv';
+import es6require from '@mattinsler/es6require';
 
 import * as errors from './errors';
 
@@ -193,7 +194,7 @@ export default class AppContext {
 
     this.loadBabel();
 
-    let contextInitializer = require(filename);
+    let contextInitializer = es6require(filename);
     return this.create(contextInitializer, opts);
   }
 
