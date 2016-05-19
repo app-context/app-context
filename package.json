@@ -1,6 +1,6 @@
 {
   "name": "app-context",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Sequential bootloader and context for node applications",
   "keywords": [],
   "homepage": "https://github.com/app-context/app-context",
@@ -19,7 +19,7 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "@mattinsler/es6require": "0.0.2",
+    "@mattinsler/es6require": "0.0.3",
     "babel-polyfill": "6.5.0",
     "chalk": "1.1.0",
     "clone": "1.0.2",
