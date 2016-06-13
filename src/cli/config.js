@@ -2,7 +2,7 @@ import os from 'os';
 import stringify from 'json-stringify-safe';
 
 import AppContext from '../../';
-import {orderObject} from '../utils';
+import { orderObject } from '../utils';
 
 export const description = 'Print configuration';
 
