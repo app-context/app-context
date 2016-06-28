@@ -1,7 +1,8 @@
 import path from 'path';
-import { spawn } from 'child_process';
 
-import * as errors from '../errors';
+import { hasBabel, installBabel } from '../babel-tools';
+import { installNpmModules } from '../module-tools';
+// import * as errors from '../errors';
 import AppContext from '../../';
 
 export function usage() {
@@ -20,17 +21,11 @@ function getInitializerModules(context) {
   .map((i) => i.module);
 }
 
-export function execute() {
+export async function execute() {
+  if (hasBabel()) {
+    await installBabel();
+  }
+
   const context = AppContext.load();
-
-  const initializerModules = getInitializerModules(context);
-  const command = `npm install --save --save-exact ${initializerModules.join(' ')}`;
-
-  return new Promise((resolve, reject) => {
-    const proc = spawn('sh', ['-c', command], { cwd: process.cwd(), stdio: 'inherit' });
-    proc.on('close', (code) => {
-      if (code !== 0) { return reject(new Error(`${command} exited with code ${code}`)); }
-      resolve();
-    });
-  });
+  return installNpmModules(getInitializerModules(context));
 }

@@ -7,6 +7,7 @@ import osenv from 'osenv';
 import es6require from '@mattinsler/es6require';
 
 import * as errors from './errors';
+import { getBabelModuleNames, hasBabel, registerBabel } from './babel-tools';
 
 const debug = require('debug')('app-context');
 
@@ -127,36 +128,9 @@ export default class AppContext {
   }
 
   static loadBabel() {
-    const babelFile = path.join(process.cwd(), '.babelrc');
-    const pkg = this.findAndLoadPackage();
+    if (!hasBabel()) { return; }
 
-    let babelConfig;
-
-    if (fs.existsSync(babelFile)) {
-      babelConfig = JSON.parse(fs.readFileSync(babelFile, 'utf8'));
-    } else if (pkg && pkg.babel) {
-      babelConfig = pkg.babel;
-    } else {
-      return;
-    }
-
-    // environment configuration
-    // if (babelConfig.env) {
-    //   const environment = process.env.BABEL_ENV || process.env.NODE_ENV || 'development';
-    //   if (babelConfig.env[environment]) {
-    //
-    //   }
-    // }
-
-    const unmetRequirements = [].concat(
-      (babelConfig.presets || []).map((p) => {
-        return p.startsWith('babel-preset-') ? p : `babel-preset-${p}`;
-      }),
-      (babelConfig.plugins || []).map((p) => {
-        const name = Array.isArray(p) ? p[0] : p;
-        return name.startsWith('babel-plugin-') ? name : `babel-plugin-${name}`;
-      })
-    ).filter((name) => {
+    const unmetRequirements = getBabelModuleNames().filter(name => {
       try {
         require.resolve(path.join(process.cwd(), 'node_modules', name));
         return false;
@@ -165,16 +139,17 @@ export default class AppContext {
       }
     });
 
-    if (unmetRequirements.length > 0) {
-      throw errors.message([
-        'Unmet babel requirements: ' + unmetRequirements.join(', '),
-        'Fix this by running "npm install --save --save-exact ' + unmetRequirements.join(' ') + '"'
-      ].join(os.EOL));
+    if (unmetRequirements.length === 0) {
+      return registerBabel();
     }
 
-    require('babel-register')({
-      sourceRoot: process.cwd()
-    });
+    throw errors.message([
+      `Unmet babel requirements: ${unmetRequirements.join(', ')}`,
+      'To fix this, either run:',
+      '  "app-context install"',
+      'or',
+      `  Fix this by running "npm install --save --save-exact ${unmetRequirements.join(' ')}"`
+    ].join(os.EOL));
   }
 
   static loadFromFile(filename, opts, shouldThrow = true) {

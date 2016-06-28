@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { cyan, green, yellow } from 'chalk';
 
+import { installBabel } from '../babel-tools';
 import * as errors from '../errors';
 
 const description = 'Initialize app-context in this directory';
@@ -63,6 +64,7 @@ function execute(args, { babel = false }) {
   createAppContextJs();
   if (babel) {
     createBabelrc();
+    installBabel();
   }
 }
 
